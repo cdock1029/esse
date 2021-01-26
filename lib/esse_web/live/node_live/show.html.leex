@@ -1,0 +1,47 @@
+<h1>Show Node</h1>
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, EsseWeb.NodeLive.FormComponent,
+    id: @node.id,
+    title: @page_title,
+    action: @live_action,
+    node: @node,
+    return_to: Routes.node_show_path(@socket, :show, @node) %>
+<% end %>
+<%= if @live_action in [:new_child] do %>
+  <%= live_modal @socket, EsseWeb.NodeLive.ChildFormComponent,
+    id: :new_child,
+    title: @page_title,
+    action: @live_action,
+    child: @child,
+    node: @node,
+    return_to: Routes.node_show_path(@socket, :show, @node) %>
+<% end %>
+<span><%= live_redirect "Home", to: Routes.node_index_path(@socket, :index) %></span>
+<ul>
+  <li>
+    <strong>Body:</strong>
+    <%= @node.body %>
+  </li>
+  <li>
+    <span><%= live_patch "Edit", to: Routes.node_show_path(@socket, :edit, @node), class: "button" %></span>
+  </li>
+  <%= if @node.parent != nil do %>
+    <li>
+      <strong>
+        <%= live_patch "Parent", to: Routes.node_show_path(@socket, :show, @node.parent) %>
+      </strong>
+    </li>
+  <% end %>
+  <li>
+    Children:
+    <ul>
+      <%= for child <- @node.children do %>
+        <li><%= live_patch child.body, to: Routes.node_show_path(@socket, :show, child) %></li>
+      <% end %>
+    </ul>
+  </li>
+</ul>
+<br/>
+<%= if @live_action not in [:new_child] do %>
+  <span><%= live_patch "New Child", to: Routes.node_show_path(@socket, :new_child, @node), class: "button" %></span>
+<% end %>
