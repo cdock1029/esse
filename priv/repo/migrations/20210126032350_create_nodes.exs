@@ -4,7 +4,7 @@ defmodule Esse.Repo.Migrations.CreateNodes do
   def change do
     create table(:nodes) do
       add :body, :text
-      add :parent_id, references(:nodes, on_delete: :nothing)
+      add :parent_id, references(:nodes, on_delete: :delete_all)
 
       timestamps()
     end

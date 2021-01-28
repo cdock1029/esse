@@ -27,6 +27,24 @@ defmodule EsseWeb.NodeLive.FormComponent do
     save_node(socket, socket.assigns.action, node_params)
   end
 
+  defp save_node(socket, :index, node_params) do
+    case Graph.update_node(socket.assigns.node, node_params) do
+      {:ok, node} ->
+        send(self(), {:form_success, node})
+
+        {
+          :noreply,
+          socket
+          # |> put_flash(:info, "Node updated successfully")
+        }
+
+      # |> push_redirect(to: socket.assigns.return_to)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
+
   defp save_node(socket, :edit, node_params) do
     case Graph.update_node(socket.assigns.node, node_params) do
       {:ok, _node} ->
@@ -50,19 +68,6 @@ defmodule EsseWeb.NodeLive.FormComponent do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
-    end
-  end
-
-  defp save_node(socket, :new_child, node_params) do
-    case Graph.create_node(node_params) do
-      {:ok, _child} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Child node created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
     end
   end
 end

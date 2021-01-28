@@ -20,12 +20,9 @@ defmodule EsseWeb.Router do
     live "/", PageLive, :index
 
     live "/nodes", NodeLive.Index, :index
-    live "/nodes/new", NodeLive.Index, :new
-    live "/nodes/:id/edit", NodeLive.Index, :edit
-
-    live "/nodes/:id", NodeLive.Show, :show
-    live "/nodes/:id/show/edit", NodeLive.Show, :edit
-    live "/nodes/:id/show/new-child", NodeLive.Show, :new_child
+    # live "/nodes/new", NodeLive.Index, :new
+    live "/nodes/:id", NodeLive.Index, :index
+    # live "/nodes/:id/edit", NodeLive.Index, :edit
   end
 
   # Other scopes may use custom stacks.

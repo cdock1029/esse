@@ -17,6 +17,7 @@ defmodule Esse.Graph.Node do
   def changeset(node, attrs) do
     node
     |> cast(attrs, [:body])
+    |> cast_assoc(:children)
     |> validate_required([:body])
   end
 

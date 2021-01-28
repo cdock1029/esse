@@ -1,11 +1,7 @@
-<h2><%= @title %></h2>
 <%= f = form_for @changeset, "#",
-  id: "node-form",
+  id: "root-form",
   phx_target: @myself,
-  phx_change: "validate",
-  phx_submit: "save" %>
-<%= label f, :body %>
-<%= textarea f, :body %>
-<%= error_tag f, :body %>
-<%= submit "Save", phx_disable_with: "Saving..." %>
+  phx_change: "save"
+   %>
+<%= textarea f, :body, phx_debounce: "800", placeholder: "Body", rows: 5, cols: 50 %>
 </form>

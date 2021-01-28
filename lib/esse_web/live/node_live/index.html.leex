@@ -1,35 +1,68 @@
-<h1>Listing Nodes</h1>
-
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, EsseWeb.NodeLive.FormComponent,
-    id: @node.id || :new,
-    title: @page_title,
-    action: @live_action,
-    node: @node,
-    return_to: Routes.node_index_path(@socket, :index) %>
+<%= if @node.parent do %>
+  <span>
+    <%= live_patch to: Routes.node_index_path(@socket, :index, @node.parent.id) do %>
+      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z" />
+      </svg>
+    <% end %>
+  </span>
 <% end %>
-
-<table>
+<%= if @edit == to_string(@node.id) do %>
+  <%= live_component @socket, EsseWeb.NodeLive.FormComponent,
+    id: @node.id,
+    action: @live_action,
+    node: @node
+%>
+  <%= link "Edit", to: "#", id: "root_edit", phx_click: "toggle_edit", phx_value_id: @node.id %>
+<% else %>
+  <h1 class="flex items-center justify-between my-4">
+    <span class="text-3xl font-semibold"><%= @node.body %></span>
+    <%= link "Edit", to: "#", id: "root_edit", phx_click: "toggle_edit", phx_value_id: @node.id %>
+  </h1>
+<% end %>
+<table class="w-full table-auto">
   <thead>
     <tr>
-      <th>Body</th>
-
+      <th></th>
+      <th></th>
       <th></th>
     </tr>
   </thead>
-  <tbody id="nodes">
-    <%= for node <- @nodes do %>
-      <tr id="node-<%= node.id %>">
-        <td><%= node.body %></td>
-
+  <tbody id="children">
+    <%= for child <- @node.children do %>
+      <tr id="node-<%= child.id %>">
         <td>
-          <span><%= live_redirect "Show", to: Routes.node_show_path(@socket, :show, node) %></span>
-          <span><%= live_patch "Edit", to: Routes.node_index_path(@socket, :edit, node) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: node.id, data: [confirm: "Are you sure?"] %></span>
+          <span>
+            <%= live_patch to: Routes.node_index_path(@socket, :index, child.id) do %>
+              <svg width="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            <% end %>
+          </span>
+        </td>
+        <td>
+          <%= if @edit == to_string(child.id) do %>
+            <%= live_component @socket, EsseWeb.NodeLive.FormComponent,
+              id: child.id,
+              action: @live_action,
+              node: child
+            %>
+          <% else %>
+            <textarea disabled cols="50" ><%= child.body %></textarea>
+          <% end %>
+        </td>
+        <td>
+          <div class="inline"><%= link "Edit", to: "#", id: "row_edit_#{child.id}", phx_click: "toggle_edit", phx_value_id: child.id %></div>
+          <div class="inline ml-4"><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: child.id, data: [confirm: "Are you sure?"] %></div>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<span><%= live_patch "New Node", to: Routes.node_index_path(@socket, :new) %></span>
+<span>
+  <%= live_patch to: "/" do#Routes.node_index_path(@socket, :new) do %>
+    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+  <% end %>
+</span>
