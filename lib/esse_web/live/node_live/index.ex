@@ -25,8 +25,8 @@ defmodule EsseWeb.NodeLive.Index do
   end
 
   @impl true
-  def handle_info({:form_success, node}, socket) do
-    socket = assign(socket, edit: false, node: node)
+  def handle_info(:form_success, socket) do
+    socket = assign(socket, node: Graph.get_node!(socket.assigns.node.id))
     {:noreply, socket}
   end
 
@@ -36,6 +36,11 @@ defmodule EsseWeb.NodeLive.Index do
       ^id -> {:noreply, assign(socket, edit: nil)}
       _ -> {:noreply, assign(socket, edit: id)}
     end
+  end
+
+  def handle_event("new", _, socket) do
+    socket = assign(socket, edit: :new)
+    {:noreply, socket}
   end
 
   @impl true

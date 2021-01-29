@@ -1,7 +1,8 @@
 <%= f = form_for @changeset, "#",
   id: "root-form",
   phx_target: @myself,
-  phx_change: "save"
+  phx_change: "save",
+  phx_submit: "save"
    %>
 <%= textarea f, :body, phx_debounce: "800", placeholder: "Body", rows: 5, cols: 50 %>
 </form>

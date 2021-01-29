@@ -2,6 +2,7 @@ defmodule EsseWeb.NodeLive.FormComponent do
   use EsseWeb, :live_component
 
   alias Esse.Graph
+  alias Esse.Graph.Node
 
   @impl true
   def update(%{node: node} = assigns, socket) do
@@ -24,13 +25,13 @@ defmodule EsseWeb.NodeLive.FormComponent do
   end
 
   def handle_event("save", %{"node" => node_params}, socket) do
-    save_node(socket, socket.assigns.action, node_params)
+    save_node(socket, socket.assigns.node, node_params)
   end
 
-  defp save_node(socket, :index, node_params) do
+  defp save_node(socket, %Node{id: _id}, node_params) do
     case Graph.update_node(socket.assigns.node, node_params) do
-      {:ok, node} ->
-        send(self(), {:form_success, node})
+      {:ok, _node} ->
+        send(self(), :form_success)
 
         {
           :noreply,
@@ -45,6 +46,22 @@ defmodule EsseWeb.NodeLive.FormComponent do
     end
   end
 
+  defp save_node(socket, %Node{}, node_params) do
+    case Graph.create_node(node_params) do
+      {:ok, _node} ->
+        send(self(), :form_success)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "Node created successfully")}
+
+      # |> push_redirect(to: socket.assigns.return_to)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
   defp save_node(socket, :edit, node_params) do
     case Graph.update_node(socket.assigns.node, node_params) do
       {:ok, _node} ->
@@ -55,19 +72,6 @@ defmodule EsseWeb.NodeLive.FormComponent do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
-    end
-  end
-
-  defp save_node(socket, :new, node_params) do
-    case Graph.create_node(node_params) do
-      {:ok, _node} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Node created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
     end
   end
 end
